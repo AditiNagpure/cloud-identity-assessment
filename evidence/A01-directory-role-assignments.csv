@@ -1,0 +1,5 @@
+"Role","Principal","Type","Scope"
+"Global Administrator","Aditi Nagpure","user","/"
+"Global Administrator","app-backup-automation","servicePrincipal","/"
+"Global Administrator","Break Glass","user","/"
+"User Administrator","svc-reporting (shared account)","user","/"
