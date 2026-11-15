@@ -185,6 +185,17 @@ Every fix was verified by re-running the **same audit check** that found the pro
 | F04 | Container set to Private; account-level public blob access off; shared key access off | Same public URL in an unauthenticated browser returns `PublicAccessNotPermitted` | PASS | `V04-F04-blob-blocked.png` |
 | F05 | Storage diagnostic logs and subscription activity log sent to `law-cyberrange`; retention 30 → 90 days | Re-ran A07: Configured / Configured / 90 | PASS | `V05-F05-logging-enabled.png` |
 
+### Tool corroboration: Microsoft Defender for Cloud (free tier)
+
+Checked about 5 hours after the audit (20:30 IST).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Secure score | **77%** (unchanged from the pre-assessment baseline) | `T01-defender-secure-score.png` |
+| Storage recommendations | No recommendation for public blob access, shared key or missing logging on `stidaudit68750`; only generic "Not evaluated" plan recommendations | `T02-defender-storage-recommendations.png` |
+
+**Interpretation:** the storage account was exposed for roughly 1.5 hours (14:59–16:20 IST) and fixed before Defender for Cloud's periodic assessment picked it up, and the identity findings (F01–F03) are outside what the free posture tier evaluates. A posture tool with assessment latency would have missed every planted weakness in this window; the manual audit found all of them. This argues for pairing scheduled posture scores with event-driven detection on the control plane, which is what the F01 Sentinel rule provides.
+
 ## 6. Detection engineering (closing the "no alert fired" gap in F01)
 
 **Rule:** *Privileged role or high-risk API permission granted to service principal* — Microsoft Sentinel scheduled analytics rule, severity High, MITRE T1098 (Account Manipulation), runs every 10 minutes over a 20-minute window. Alerts when (a) any Entra directory role is assigned to a service principal, or (b) a service principal is granted one of: `RoleManagement.ReadWrite.Directory`, `Directory.ReadWrite.All`, `AppRoleAssignment.ReadWrite.All`, `Application.ReadWrite.All`, `Mail.Read`, `Mail.ReadWrite`, `Files.ReadWrite.All`.
@@ -205,6 +216,6 @@ Every fix was verified by re-running the **same audit check** that found the pro
 - Single-tenant trial environment; findings reflect planted conditions, not organic drift.
 - Workload identity Conditional Access requires a Workload Identities Premium licence not present in this tenant; recommended but not tested.
 - Planted credentials were not used to demonstrate impact; risk statements are based on documented permission capabilities.
-- Defender for Cloud recommendations had not yet refreshed at the time of the audit; tool corroboration is recorded separately.
+- Defender for Cloud was checked only 5 hours after the audit; its scoring cycle is roughly daily, so the secure score had not refreshed.
 - O1 (phishing-resistant MFA for admins) is left open; it requires physical passkey enrolment and is tracked in the risk register.
 - See `access-map.md` for before/after diagrams and `risk-register.md` for scoring against least privilege and Zero Trust.
