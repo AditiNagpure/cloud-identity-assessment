@@ -47,6 +47,28 @@ Eight independent checks, run from Azure Cloud Shell and the Defender portal:
 | A07 | Diagnostic logging and retention | Az PowerShell |
 | A08 | Whether Sentinel recorded the privileged changes | KQL (Defender Advanced Hunting) |
 
+## Defender for Cloud posture check
+
+Final posture check run in Microsoft Defender for Cloud (free Foundational CSPM tier) after remediation:
+
+| Metric | Result |
+|---|---|
+| Secure score | **76%** |
+| Assessed resources | 5 |
+| Critical recommendations | 0 |
+| Attack paths | 0 |
+
+**Notable open recommendations and disposition**
+
+| Recommendation | Resource | Why it matters | Disposition |
+|---|---|---|---|
+| Email notification for high-severity alerts not configured | Subscription | Alerts fire with no one notified — a detection-to-response gap | Would fix in production (set security contact + notify on High) |
+| Guest Attestation / Guest Configuration extensions missing | win11-lab01 | No boot-integrity or configuration-drift checks on the VM | Would fix in production; accepted for a short-lived lab VM |
+| Azure Backup not enabled | win11-lab01 | No recovery point for the VM | Accepted — disposable lab VM |
+| Defender CSPM / Defender for Resource Manager not enabled | Subscription | No risk prioritisation, attack-path analysis or ARM threat detection | Accepted — paid plans, out of scope for a free lab |
+
+Risk prioritisation requires the paid Defender CSPM plan, so remaining recommendations show as "not evaluated" for risk. Evidence: [`evidence/secure-score-overview.png`](evidence/secure-score-overview.png), [`evidence/secure-score-recommendations.png`](evidence/secure-score-recommendations.png).
+
 ## Skills demonstrated
 
 - Entra ID app registration / service principal security: application permissions vs directory roles, credential hygiene, ownership
@@ -55,6 +77,7 @@ Eight independent checks, run from Azure Cloud Shell and the Defender portal:
 - Storage exposure assessment and hardening
 - Logging architecture: diagnostic settings, activity log, retention
 - Detection engineering in Microsoft Sentinel: KQL, backtest, live validation, incident triage, self-review of tuning
+- Cloud security posture management with Microsoft Defender for Cloud: Secure Score review and risk-based disposition of recommendations
 - Risk scoring against least privilege and Zero Trust (verify explicitly, least privilege, assume breach)
 
 ## Limitations
@@ -63,7 +86,7 @@ Single trial tenant with planted conditions. Workload-identity Conditional Acces
 
 ## Related projects
 
-- **Microsoft Cyber Range**: AiTM phishing → detect in Entra ID Protection / Sentinel → block with FIDO2 passkeys (same tenant)
+- **[Microsoft Cyber Range](https://github.com/AditiNagpure/microsoft-cyber-range)**: AiTM phishing → detect in Entra ID Protection / Sentinel → block with FIDO2 passkeys (same tenant); demonstrates the phishing-resistant MFA control that addresses open finding O1
 - **[Detection-as-Code](https://github.com/AditiNagpure/detection-as-code)**: Sigma, Sentinel and YARA rules with CI testing; includes the break-glass sign-in rule cited as a compensating control here
 
 ---
